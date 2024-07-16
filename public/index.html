@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HubSpot Contacts</title>
+  </head>
+  <body>
+    <h1>HubSpot Contacts CRUD</h1>
+    <form id="contactForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="firstName" placeholder="First Name" required />
+      <input type="text" id="lastName" placeholder="Last Name" required />
+      <input type="tel" id="phone" placeholder="Phone" required />
+      <button type="submit">Create Contact</button>
+    </form>
+    <br />
+    <button id="getAllContacts">Get All Contacts</button>
+    <br />
+
+    <div>
+      <input type="text" id="contactId" placeholder="Contact ID" />
+      <button id="getContactById">Get Contact By ID</button>
+
+      <div id="contactDetails"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("contactForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const firstName = document.getElementById("firstName").value;
+          const lastName = document.getElementById("lastName").value;
+          const phone = document.getElementById("phone").value;
+
+          const response = await fetch("http://localhost:3000/api/contacts", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, firstName, lastName, phone }),
+          });
+
+          const result = await response.json();
+          console.log(result);
+        });
+
+      document
+        .getElementById("getAllContacts")
+        .addEventListener("click", async () => {
+          const response = await fetch("http://localhost:3000/api/contacts", {
+            method: "GET",
+          });
+
+          const result = await response.json();
+          console.log(result);
+        });
+
+      document
+        .getElementById("getContactById")
+        .addEventListener("click", async () => {
+          const contactId = document.getElementById("contactId").value;
+          const response = await fetch(
+            `http://localhost:3000/api/contacts/${contactId}`,
+            {
+              method: "GET",
+            }
+          );
+
+          const result = await response.json();
+          console.log(result);
+          displayContactDetails(result);
+        });
+
+      function displayContactDetails(contact) {
+        const contactDetailsContainer =
+          document.getElementById("contactDetails");
+        contactDetailsContainer.innerHTML = `
+                <h2>Contact Details</h2>
+                <p><strong>ID:</strong> ${contact.id}</p>
+                <p><strong>Email:</strong> ${contact.properties.email}</p>
+                <p><strong>First Name:</strong> ${contact.properties.firstname}</p>
+                <p><strong>Last Name:</strong> ${contact.properties.lastname}</p>
+                <p><strong>Phone:</strong> ${contact.properties.phone}</p>
+            `;
+      }
+    </script>
+  </body>
+</html>
